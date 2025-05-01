@@ -15,7 +15,7 @@ import turtlesim_env_single
 class PlaySingle(DqnSingle):
    
    def run_turtle(self, tname):
-        current_state = self.env.reset(tnames=[tname], sections=['default'])[tname].map
+        current_state = self.env.reset(tnames=[tname], sections=['random'])[tname].map # Losuje punkt startowy, aby zawsze zaczynać od pierwszego zmienić na 'default'
         last_state=[i.copy() for i in current_state]
         env.tapi.setPen(tname,turtlesim.srv.SetPenRequest(off=0))   # Rysuj trasę
         
