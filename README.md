@@ -24,6 +24,13 @@ Now you can start training models:
 ./03-exec_turtle_script.sh code/dqn_single.py
 ```
 
+To test model and view turtle running constantly:
+
+```shell
+./04-run-test.sh code/play_single.py models/model_file.tf
+```
+
+
 When you're done, you can delete the container:
 
 ```shell
