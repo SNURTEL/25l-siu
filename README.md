@@ -30,6 +30,21 @@ To test model and view turtle running constantly:
 ./04-run-test.sh code/play_single.py models/model_file.tf
 ```
 
+When you have a working model, prepare the docker image with all required files included:
+
+```shell
+docker build --build-arg MODEL_PATH=models/<MODEL>.tf -t siu-stage2 .
+```
+
+Verify the image is working:
+
+```shell
+docker run --name siu-stage2 -p 6080:80 siu-stage2
+```
+
+Open [localhost:6080](http://localhost:6080) in your web browser and run `bash siu-stage2-demo.sh` in LXDE terminal. The route should open, and after a few seconds the turtle should start running.
+
+## Misc
 
 When you're done, you can delete the container:
 
