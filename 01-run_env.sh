@@ -7,8 +7,8 @@ docker run \
   -p 6080:80 \
   -e RESOLUTION=1920x1080 \
   --volume $(pwd)/code:/root/code \
-  --volume $(pwd)/roads.png:/roads.png \
-  --volume $(pwd)/routes.csv:/root/routes.csv \
+  --volume $(pwd)/roads_multi.png:/roads.png \
+  --volume $(pwd)/routes_multi.csv:/root/routes.csv \
   --volume $(pwd)/models:/root/models \
   --detach \
   dudekw/siu-20.04
