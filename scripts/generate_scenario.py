@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 PX_IN_METER = 22
 COLORS = ["red", "green", "blue", "orange", "purple", "cyan", "magenta"]
@@ -17,11 +17,26 @@ def draw_section(
     section: Section,
     draw_context: ImageDraw.ImageDraw,
     color: str = "red",
+    number: int = 1,
 ) -> None:
     draw_context.rectangle([section.top_left, section.bottom_right], outline=color, width=5)
     radius = 8
     x, y = section.dest
     draw_context.ellipse([(x - radius, y - radius), (x + radius, y + radius)], fill=color)
+
+    # Dodanie numeru scenariusza na środku prostokąta
+    center_x = (section.top_left[0] + section.bottom_right[0]) // 2
+    center_y = (section.top_left[1] + section.bottom_right[1]) // 2
+
+    # Dodanie tekstu z numerem
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+    except:
+        font = ImageFont.load_default()
+
+    # Rysowanie tekstu bez białego tła
+    text = str(number)
+    draw_context.text((center_x, center_y), text, fill=color, font=font, anchor="mm")
 
 
 def get_section_definition(
@@ -46,11 +61,12 @@ def get_section_definition(
 
 if __name__ == "__main__":
     sections = [
-        Section((480, 460), (640, 600), (730, 710)),
-        Section((804, 727), (885, 863), (1100, 781)),
-        Section((1527, 476), (1665, 672), (1189, 450)),
-        Section((1058, 224), (1200, 428), (790, 125)),
-        Section((500, 80), (730, 180), (385, 360)),
+        Section((1300, 476), (1395, 575), (1134, 333)),
+        Section((1008, 225), (1083, 350), (750, 360)),
+        Section((660, 400), (750, 475), (800, 775)),
+        Section((825, 735), (900, 860), (1065, 956)),
+        Section((1120, 900), (1195, 1000), (1660, 820)),
+        Section((1662, 687), (1766, 795), (1450, 516)),
     ]
     num_of_agents = 2
 
@@ -59,7 +75,7 @@ if __name__ == "__main__":
     csv_string = ""
     for idx, section in enumerate(sections):
         color = COLORS[idx % (len(COLORS))]
-        draw_section(section, draw_context, color)
+        draw_section(section, draw_context, color, idx + 1)  # dodano idx + 1
         csv_string += get_section_definition(section, num_of_agents)
         csv_string += "\n"
     img.save("roads_multi_scenario.png")
