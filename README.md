@@ -28,6 +28,7 @@ To test model and view turtle running constantly:
 
 ```shell
 ./04-run-test.sh code/play_single.py models/model_file.tf
+./04-run-test.sh code/play_multi.py models/model_file.tf
 ```
 
 When you have a working model, prepare the docker image with all required files included:
