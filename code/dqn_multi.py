@@ -64,7 +64,8 @@ class DqnMulti(DqnSingle):
     def train_main(self,save_model=True,save_state=True):
         self.target_model=keras.models.clone_model(self.model)                      # model pomocniczy (wolnozmienny)
         self.replay_memory=deque(maxlen=self.REPLAY_MEM_SIZE_MAX)                   # historia kroków
-        episode_rewards=np.zeros(self.EPISODES_MAX)*np.nan                          # historia nagród w epizodach
+        episode_margin_of_error = 100 # don't ask
+        episode_rewards=np.zeros(self.EPISODES_MAX + episode_margin_of_error)*np.nan                          # historia nagród w epizodach
         epsilon=self.EPS_INIT
         step_cnt=0
         train_cnt=0
@@ -123,6 +124,8 @@ class DqnMulti(DqnSingle):
 # przykładowe wywołanie uczenia
 from tensorflow.keras.models import load_model
 if __name__ == "__main__":
+    episodes_no_collisions = 2000
+    episodes_with_collisions = 2000
     env=turtlesim_env_multi.provide_env()                   # utworzenie środowiska
     env.PI_BY=3                                             # zmiana wybranych parametrów środowiska
     prefix='X6-c20c20c20d64-M-lr001'                        # bazowy z kolizjami
@@ -132,11 +135,14 @@ if __name__ == "__main__":
     dqnm=DqnMulti(env,id_prefix=prefix)                     # utworzenie klasy uczącej
     dqnm.make_model()                                       # skonstruowanie sieci neuronowej
     
-    dqnm.EPISODES_MAX = 500
+    print("Starting training with no collisions")
+    dqnm.EPISODES_MAX = episodes_no_collisions
     rewards_no_collisions = dqnm.train_main(save_model=True, save_state=True)  # wywołanie uczenia (wyniki zapisywane okresowo)
     
-    dqnm.EPISODES_MAX = 500
+    print("Starting training with collisions enabled")
+    dqnm.EPISODES_MAX = episodes_no_collisions + episodes_with_collisions
     env.DETECT_COLLISION = True
     env.reset()
     rewards_collisions = dqnm.train_main(save_model=True, save_state=True)  # wywołanie uczenia (wyniki zapisywane okresowo)
-    np.savetxt("rewards.txt", np.concatenate([rewards_no_collisions, rewards_collisions]))
+    
+    dqnm.model.save(f"models/final-e{episodes_no_collisions}-e{episodes_with_collisions}.tf")
