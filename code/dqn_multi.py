@@ -118,7 +118,7 @@ class DqnMulti(DqnSingle):
                 if epsilon > self.EPS_MIN:                                              # rosnące p-stwo uczenia na podst. historii
                     epsilon*=self.EPS_DECAY
                     epsilon=max(self.EPS_MIN,epsilon)                                   # ogranicz malenie eps
-
+        return episode_rewards
 
 # przykładowe wywołanie uczenia
 from tensorflow.keras.models import load_model
@@ -126,9 +126,17 @@ if __name__ == "__main__":
     env=turtlesim_env_multi.provide_env()                   # utworzenie środowiska
     env.PI_BY=3                                             # zmiana wybranych parametrów środowiska
     prefix='X6-c20c20c20d64-M-lr001'                        # bazowy z kolizjami
-    env.DETECT_COLLISION=True
+    env.DETECT_COLLISION=False
     env.setup('routes.csv')                                 # połączenie z symulatorem
     agents=env.reset()                                      # ustawienie agenta
     dqnm=DqnMulti(env,id_prefix=prefix)                     # utworzenie klasy uczącej
     dqnm.make_model()                                       # skonstruowanie sieci neuronowej
-    dqnm.train_main(save_model=True,save_state=True)        # wywołanie uczenia (wyniki zapisywane okresowo)
+    
+    dqnm.EPISODES_MAX = 500
+    rewards_no_collisions = dqnm.train_main(save_model=True, save_state=True)  # wywołanie uczenia (wyniki zapisywane okresowo)
+    
+    dqnm.EPISODES_MAX = 500
+    env.DETECT_COLLISION = True
+    env.reset()
+    rewards_collisions = dqnm.train_main(save_model=True, save_state=True)  # wywołanie uczenia (wyniki zapisywane okresowo)
+    np.savetxt("rewards.txt", np.concatenate([rewards_no_collisions, rewards_collisions]))
