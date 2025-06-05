@@ -21,7 +21,7 @@ class TurtlesimEnvBase(metaclass=abc.ABCMeta):
         self.GRID_RES = 5               # liczba komórek siatki
         self.CAM_RES = 200              # dł. boku siatki [px]
         self.SEC_PER_STEP = 1.0         #*okres dyskretyzacji sterowania - nie mniej niż 1 [s]
-        self.WAIT_AFTER_MOVE = .01      # oczekiwanie po setPose() i przed color_api.check() [s] (0.005 też daje radę)
+        self.WAIT_AFTER_MOVE = .0001      # oczekiwanie po setPose() i przed color_api.check() [s] (0.005 też daje radę)
         # parametry oceny sytuacyjnej
         self.SPEED_RWRD_RATE = 0.5      #>wzmocnienie nagrody za jazdę w kierunku
         self.SPEED_RVRS_RATE = -10.0    #<wzmocnienie kary za jazdę pod prąd
@@ -92,8 +92,10 @@ class TurtlesimEnvBase(metaclass=abc.ABCMeta):
             elif sections[tidx]=='random':                  # żółw pozycjonowany w losowym segmencie jego trasy
                 # TODO STUDENCI
                 # losowanie obszaru proporcjonalnie do liczby planowanych żółwi w obszarze
-                agent.route=str(np.random.randint(1,len(self.routes)+1)) # losowa trasa
-                sec_id=agent.sec_id
+                agent_sections = self.routes[agent.route]
+                sec_id = random.choices(
+                    range(len(agent_sections)), weights=[sec[0] for sec in agent_sections], k=1
+                )[0]
             else:                                           # żółw pozycjonowany we wskazanym segmencie (liczone od 0)
                 sec_id=sections[tidx]
             section=self.routes[agent.route][sec_id]        # przypisanie sekcji, w której się odrodzi
